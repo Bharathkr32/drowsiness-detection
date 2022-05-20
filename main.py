@@ -6,7 +6,9 @@ import imutils
 import dlib
 import cv2
 from playsound import playsound
-import threading
+import sys
+cascPath = "haarcascade_frontalface_default.xml"
+faceCascade = cv2.CascadeClassifier(cascPath)
 #calculating eye aspect ratio
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the vertical
@@ -37,7 +39,7 @@ predictor_path = 'shape_predictor_68_face_landmarks.dat'
 
 # define constants for aspect ratios
 EYE_AR_THRESH = 0.25
-EYE_AR_CONSEC_FRAMES = 48
+EYE_AR_CONSEC_FRAMES = 10
 MOU_AR_THRESH = 0.75
 
 COUNTER = 0
@@ -66,7 +68,9 @@ while True:
 	prev_yawn_status = yawnStatus
 	# detect faces in the grayscale frame
 	rects = detector(gray, 0)
-
+	faces1=faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5,minSize=(20,20),flags=cv2.CASCADE_SCALE_IMAGE)
+	for (x, y, w, h) in faces1:
+		cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 	# loop over the face detections
 	for rect in rects:
 		# determine the facial landmarks for the face region, then
@@ -126,7 +130,7 @@ while True:
 			cv2.putText(frame, output_text, (10,100),cv2.FONT_HERSHEY_SIMPLEX, 0.7,(255,0,0),2)
 		else:
 			yawnStatus = False
-			yawns=0
+			
 
 		if prev_yawn_status == True and yawnStatus == False:
 			yawns+=1
